@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {  List, Avatar, Space, Button} from 'antd';
+import {  List, Avatar, Space, Button,message} from 'antd';
 import { MessageOutlined, LikeOutlined, StarOutlined } from '@ant-design/icons'
 import PubSub from 'pubsub-js'
 import { addItem,delItem,increment,decrement } from '../../redux/actions/count'
@@ -24,19 +24,19 @@ class Count extends Component {
       const itemObj = {key,title,href,description}
       this.props.addItem(itemObj)
       this.increment()
-      console.log('添加成功！')
+      this.success1()
     }else{
         const re = codeItem.filter(obj =>{
           return obj.key === key
         })
 
         if(re.length === 1){
-          console.log('已添加，请勿重复添加！')
+          this.error1()
         }else{
             const itemObj = {key,title,href,description}
             this.props.addItem(itemObj)
             this.increment()
-            console.log('添加成功！')
+            this.success1()
         }
         }
     }
@@ -45,7 +45,7 @@ class Count extends Component {
       const codeItem = this.props.codeItem
       const {title,href,description,key} = item
       if(codeItem.length === 0){
-        console.log('请先添加后再移除!')
+        this.error2()
       }else{
           const re = codeItem.filter(obj =>{
             return obj.key === key
@@ -55,9 +55,9 @@ class Count extends Component {
             const itemObj = {key,title,href,description}
             this.props.delItem(itemObj)
             this.decrement()
-            console.log('移除成功！')
+            this.success2()
           }else{             
-              console.log('请先添加后再移除!')
+            this.error2()
           }
           }
       }
@@ -69,6 +69,46 @@ class Count extends Component {
   decrement = ()=>{
     this.props.decrement(1)
   }
+
+  success1 = () => {
+    message.success({
+      content: '添加成功',
+      className: 'custom-class',
+      style: {
+        marginTop: '20vh',
+      },
+    });
+  };
+
+  success2 = () => {
+    message.success({
+      content: '移除成功',
+      className: 'custom-class',
+      style: {
+        marginTop: '20vh',
+      },
+    });
+  };
+
+  error1 = () => {
+    message.error({
+      content: '已添加，请勿重复添加！',
+      className: 'custom-class',
+      style: {
+        marginTop: '20vh',
+      },
+    });
+  };
+
+  error2 = () => {
+    message.error({
+      content: '请先添加后再移除!',
+      className: 'custom-class',
+      style: {
+        marginTop: '20vh',
+      },
+    });
+  };
 
   componentDidMount(){
     this.token = PubSub.subscribe('repositoyData',(_,stateObj)=>{
@@ -125,13 +165,6 @@ class Count extends Component {
                         <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
                         <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
                       ]}
-                      // extra={
-                      //   <img
-                      //     width={120}
-                      //     alt="logo"
-                      //     src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                      //   />
-                      // }
                     >
                       <List.Item.Meta
                         avatar={<Avatar src={item.avatar} />}

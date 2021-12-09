@@ -1,8 +1,9 @@
 import React, { Component,useContext, useState, useEffect, useRef } from 'react';
-import { Table, Input, Button, Popconfirm, Form } from 'antd';
+import { Table, Input, Button, Popconfirm, Form ,message} from 'antd';
 import {connect} from 'react-redux'
 import { nanoid } from 'nanoid';
-import { increment,decrement } from '../../redux/actions/count'
+import ExportJsonExcel from 'js-export-excel'
+import { increment,decrement,delItem,addItem,delUser } from '../../redux/actions/count'
 
 const EditableContext = React.createContext(null);
 
@@ -95,7 +96,6 @@ class Person extends Component {
 			title: '标题',
 			dataIndex: 'name',
 			width: '22%',
-			editable: true,
 		  },
 		  {
 			title: '链接',
@@ -111,7 +111,7 @@ class Person extends Component {
 			width: '10%',
 			render: (_, record) =>
 			  this.state.dataSource.length >= 1 ? (
-				<Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
+				<Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record,record.key)}>
 				  <Button 
 				  type='danger'>
 					  移除下载
@@ -120,7 +120,7 @@ class Person extends Component {
 			  ) : null,
 		  },
 		];
-	
+				
 		const codes  = this.props.codes
 		const users  = this.props.users
 		let temp = []
@@ -141,52 +141,69 @@ class Person extends Component {
 				description: element.description,
 			 })
 		});
-		// console.log(temp);
 
 		this.state = {
 			dataSource:temp,
 			count:temp.length,
 		  };		
 		}	
-
-		increment = ()=>{
-			this.props.increment(1)
-		  }
 		
-		  decrement = ()=>{
+		decrement = ()=>{
 			this.props.decrement(1)
-		  }
+		}
 
-	handleDelete = (key) => {
+	handleDelete = (record,key) => {
 			const dataSource = [...this.state.dataSource];
 			this.setState({
 			  dataSource: dataSource.filter((item) => item.key !== key),
 			});
+			this.props.delItem(record)
+			this.props.delUser(record)
 			this.decrement()
+			this.success1()
 		};
-	handleAdd = () => {
-			this.increment()
-			const { count, dataSource } = this.state;
-			const newData = {
-			  key: count,
-			  name: `Edward King ${count}`,
-			  herf: '32',
-			  description: `London, Park Lane no. ${count}`,
-			};
-			this.setState({
-			  dataSource: [...dataSource, newData],
-			  count: count + 1,
+		success1 = () => {
+			message.success({
+			  content: '移除成功',
+			  className: 'custom-class',
+			  style: {
+				marginTop: '20vh',
+			  },
 			});
-		};
-	handleSave = (row) => {
-			const newData = [...this.state.dataSource];
-			const index = newData.findIndex((item) => row.key === item.key);
-			const item = newData[index];
-			newData.splice(index, 1, { ...item, ...row });
-			this.setState({
-			  dataSource: newData,
-			});
-		};
+		  };
+
+		  download = ()=>{
+			const temp = [];
+			this.state.dataSource.map(item => {
+				 // 表头一一对应
+				return temp.push(
+						   {
+							   '标题':item.name,
+							   '链接':item.href, 
+							   '描述':item.description, 
+						   }
+					   )
+				 })
+				// 调用导出excel方法
+				this.downloadFileToExcel()
+		  }
+
+
+		  downloadFileToExcel = () => {
+			let option = {};  //option代表的就是excel文件
+			option.fileName = 'github表';  //excel文件名称
+			option.datas = [
+				{
+					sheetData: this.state.dataSource,  //excel文件中的数据源
+					sheetName: 'Info',  //excel文件中sheet页名称
+					// sheetFilter: ['你的名称', '我的名称', '你的编号'],  //excel文件中需显示的列数据
+					sheetHeader:['标题', '链接', '描述']  //excel文件中每列的表头名称
+				}
+			]
+			let toExcel = new ExportJsonExcel(option);  //生成excel文件
+			toExcel.saveExcel();  //下载excel文件
+		}
+
 	
 	render() {
 	const overall = this.props.overall
@@ -218,13 +235,13 @@ class Person extends Component {
       <div>
 		<h2>下载总数:{overall}</h2>
         <Button
-          onClick={this.handleAdd}
+          onClick={this.download}
           type="primary"
           style={{
             marginBottom: 16,
           }}
         >
-          自定义添加
+          导出Excel
         </Button>
         <Table
 		  rowKey={() => nanoid()}
@@ -245,5 +262,5 @@ export default connect(
 		users:state.userItem,
 		overall:state.overall
 	}),//映射状态
-	{increment,decrement}//映射操作状态的方法
+	{increment,decrement,delItem,addItem,delUser}//映射操作状态的方法
 )(Person)

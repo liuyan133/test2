@@ -20,12 +20,10 @@ class SearchGood extends Component {
             // this.props.updateAppState({isLoading:false,users:response.data.items})
             PubSub.publish('repositoyData',{isLoading:false})
             this.addAll(response.data.items)          
-            console.log('成功了',response.data.items)
         },
         error => 
         {
           PubSub.publish('repositoyData',{isLoading:false,err:error.message})
-          console.log('失败了',error.messgae)
         }
     )
 }
@@ -34,7 +32,7 @@ class SearchGood extends Component {
     return (     
       <Space direction="vertical">    
         <div>
-          <input  ref={c => this.keyEl = c} type="text" placeholder="输入仓库的关键字"/>&nbsp;
+          <input className="box1" ref={c => this.keyEl = c} type="text" placeholder="输入仓库的关键字"/>&nbsp;
           <Button  onClick={this.search}>搜索</Button>
         </div>
       </Space>

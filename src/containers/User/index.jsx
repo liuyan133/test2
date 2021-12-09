@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import PubSub from 'pubsub-js'
 import { addUser,delUser,increment,decrement } from '../../redux/actions/count'
-import { Button ,Card ,List } from 'antd'
+import { Button ,Card ,List ,message} from 'antd'
 import './index.css'
 
 
@@ -20,19 +20,19 @@ import './index.css'
             const itemObj = {key,title,href,description}
             this.props.addUser(itemObj)
             this.increment()
-            console.log('添加成功！')
+            this.success1()
           }else{
               const re = userItem.filter(obj =>{
                 return obj.key === key
               })
       
               if(re.length === 1){
-                console.log('已添加，请勿重复添加！')
+                this.error1()
               }else{
                   const itemObj = {key,title,href,description}
                   this.props.addUser(itemObj)
                   this.increment()
-                  console.log('添加成功！')
+                  this.success1()
               }
             }
         }
@@ -41,7 +41,7 @@ import './index.css'
             const userItem = this.props.userItem
             const {title,href,description,key} = item
             if(userItem.length === 0){
-              console.log('请先添加后再移除!')
+              this.error2()
             }else{
                 const re = userItem.filter(obj =>{
                   return obj.key === key
@@ -51,14 +51,13 @@ import './index.css'
                   const itemObj = {key,title,href,description}
                   this.props.delUser(itemObj)
                   this.decrement()
-                  console.log('移除成功！')
+                  this.success2()
                 }else{             
-                    console.log('请先添加后再移除!')
+                  this.error2()
                 }
                 }
             }
     
-
         increment = ()=>{
             this.props.increment(1)
         }
@@ -76,7 +75,46 @@ import './index.css'
       componentWillUnmount(){
             PubSub.unsubscribe(this.token)
         }
-
+        success1 = () => {
+          message.success({
+            content: '添加成功',
+            className: 'custom-class',
+            style: {
+              marginTop: '20vh',
+            },
+          });
+        };
+      
+        success2 = () => {
+          message.success({
+            content: '移除成功',
+            className: 'custom-class',
+            style: {
+              marginTop: '20vh',
+            },
+          });
+        };
+      
+        error1 = () => {
+          message.error({
+            content: '已添加，请勿重复添加！',
+            className: 'custom-class',
+            style: {
+              marginTop: '20vh',
+            },
+          });
+        };
+      
+        error2 = () => {
+          message.error({
+            content: '请先添加后再移除!',
+            className: 'custom-class',
+            style: {
+              marginTop: '20vh',
+            },
+          });
+        };
+      
     render() {
     const {isLoading,err} = this.state
     const {overall,allUser} = this.props
@@ -101,14 +139,18 @@ import './index.css'
                 isLoading ? <h2 style={{color:'yellow'}}>Loading</h2>:
                 err ? <h2 style={{color:'red'}}>{err}</h2>:
                 <List
-                    grid={{ gutter: 4, column: 4 }}
+                    pagination={{
+                      pageSize: 8,
+                    }}
+                    grid={{ gutter: 8, column: 4 }}
                     dataSource={data}
                     renderItem={item => (
                     <List.Item>
                         <Card  key={item.key} title={item.title}>
-                            <a href={item.html_url} target="_blank" rel="noreferrer">
+                            <a href={item.href} target="_blank" rel="noreferrer">
                                 <img src={item.description} alt="pic" style={{width: '100px'}}/>
-                            </a>            
+                            </a>    
+                            <div>      
                             <Button 
                                 type='primary'
                                 onClick={ ()=>{
@@ -124,17 +166,16 @@ import './index.css'
                                 }}
                                 style={{marginLeft:10}}>                    
                                 移除下载
-                            </Button>       
+                            </Button>  
+                            </div>       
                         </Card>
                     </List.Item>
                     )}
               />
             }
             </div> 
-            
         )
-    }
-         
+    }       
 }
 
 export default connect(

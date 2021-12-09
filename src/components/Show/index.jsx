@@ -14,16 +14,16 @@ const User = lazy(()=> import('../../containers/User'))
 const Count = lazy(()=> import('../../containers/Count')) 
 const SearchUser = lazy(()=> import('../SearchUser')) 
 const SearchGood = lazy(()=> import('../SearchGood')) 
+const Title = lazy(()=> import('../Title')) 
 const { Header, Content, Footer, Sider } = Layout;
 
 export default   class Show extends Component {
 
         state = {
-          collapsed: true
+          collapsed: false
         };
 
         onCollapse = collapsed => {
-          console.log(collapsed);
           this.setState({ collapsed });
         };
       
@@ -50,12 +50,12 @@ export default   class Show extends Component {
                 <Suspense fallback={<Loading/>}>	
                       <Route path='/user' component={SearchUser}/>	
                       <Route path='/count' component={SearchGood}/>	
+                      <Route path='/person' component={Title}/>
                     </Suspense>		
                 </Header>
                 <Content style={{ margin: '0 16px' }}>
                   <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>User</Breadcrumb.Item>
-                    <Breadcrumb.Item>Bill</Breadcrumb.Item>
+                    <Breadcrumb.Item>内容区：</Breadcrumb.Item>
                   </Breadcrumb>
                   <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
                     <Suspense fallback={<Loading/>}>

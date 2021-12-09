@@ -4,6 +4,7 @@
 
 export const ADD_ITEM = 'add_item'
 export const DEL_ITEM = 'del_item'
+export const UPDATE_ITEM = 'update_item'
 export const ADD_All = 'add_all'
 export const ADD_AllUser = 'add_alluser'
 export const ADD_USER = 'add_user'

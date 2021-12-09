@@ -6,7 +6,7 @@ import {ADD_ITEM,DEL_ITEM} from '../constant'
 
 const initState = []
 
-export default function countReducer(preState=initState,action){
+export default function codeReducer(preState=initState,action){
 	//从action对象中获取：type、data
 	
 	const {type,data} = action
@@ -14,7 +14,7 @@ export default function countReducer(preState=initState,action){
 	switch (type) {
 		case ADD_ITEM: //如果是加
 			return [data,...preState]
-		case DEL_ITEM: //如果是加
+		case DEL_ITEM: //如果是加 
 			return preState.filter(obj =>{
 				return obj.key !== data.key
 			})
